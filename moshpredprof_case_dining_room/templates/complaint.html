@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Пожаловаться{% endblock %}
+{% block content %}
+{% set meal_map = {"breakfast":"Завтрак","lunch":"Обед","snack":"Полдник"} %}
+{% set status_map = {"new":"Новая","in_review":"В работе","resolved":"Решена","rejected":"Отклонена"} %}
+
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="card shadow-soft p-4">
+      <h4 class="mb-1">Жалоба на качество питания</h4>
+      <div class="text-muted">Опишите проблему — повар/администратор увидит обращение и сможет ответить.</div>
+      <hr class="my-4">
+
+      {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+      {% if message %}<div class="alert alert-success">{{ message }}</div>{% endif %}
+
+      <form method="post" action="{{ url_for('complaint') }}">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Дата приёма пищи</label>
+            <input class="form-control" type="date" name="meal_date" value="{{ meal_date or '' }}">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Приём пищи</label>
+            <select class="form-select" name="meal_type">
+              <option value="">— не указано —</option>
+              <option value="breakfast">Завтрак</option>
+              <option value="lunch">Обед</option>
+              <option value="snack">Полдник</option>
+            </select>
+          </div>
+          <div class="col-md-8">
+            <label class="form-label">Блюдо (если помните)</label>
+            <input class="form-control" type="text" name="item" placeholder="Например: Суп куриный">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Оценка</label>
+            <select class="form-select" name="rating">
+              <option value="">—</option>
+              {% for r in [1,2,3,4,5] %}
+                <option value="{{ r }}">{{ r }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-12">
+            <label class="form-label">Описание проблемы</label>
+            <textarea class="form-control" name="text" rows="4" placeholder="Что не так? Запах, вкус, холодная еда, недовес и т.д." required></textarea>
+          </div>
+        </divToggle>
+
+        <div class="mt-3 d-flex gap-2">
+          <button class="btn btn-primary" type="submit">Отправить жалобу</button>
+          <a class="btn btn-outline-secondary" href="/dashboard">Назад</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card shadow-soft p-4">
+      <h4 class="mb-1">Мои жалобы</h4>
+      <div class="text-muted">История ваших обращений и ответы.</div>
+      <hr class="my-4">
+
+      {% if complaints %}
+        <div class="vstack gap-3">
+          {% for c in complaints %}
+            <div class="border rounded-3 p-3 bg-white">
+              <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                <div class="fw-semibold">#{{ c.id }} • {{ c.ts }}</div>
+                <span class="badge badge-soft">{{ status_map.get(c.status, c.status) }}</span>
+              </div>
+              <div class="small text-muted mt-1">
+                {% if c.meal_date %}Дата: {{ c.meal_date }}{% endif %}
+                {% if c.meal_type %} • {{ meal_map.get(c.meal_type, c.meal_type) }}{% endif %}
+                {% if c.item %} • Блюдо: {{ c.item }}{% endif %}
+                {% if c.rating %} • Оценка: {{ c.rating }}/5{% endif %}
+              </div>
+              <div class="mt-2">{{ c.text }}</div>
+
+              {% if c.answer %}
+                <div class="mt-3 p-3 rounded-3 bg-light">
+                  <div class="fw-semibold">Ответ:</div>
+                  <div>{{ c.answer }}</div>
+                  {% if c.answered_ts %}<div class="text-muted small mt-1">{{ c.answered_ts }}</div>{% endif %}
+                </div>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="text-muted">Пока нет жалоб.</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

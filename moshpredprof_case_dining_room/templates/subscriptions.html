@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Абонементы{% endblock %}
+{% block content %}
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="card shadow-soft p-4">
+      <h4 class="mb-1">Абонемент</h4>
+      <div class="text-muted">Оформление/продление (например, на месяц).</div>
+      <hr class="my-4">
+
+      {% if active_subscription %}
+        <div class="alert alert-success">
+          Активен до: <b>{{ active_subscription.until }}</b> • Осталось дней: <b>{{ active_subscription.days_left }}</b>
+        </div>
+      {% else %}
+        <div class="alert alert-warning">Активного абонемента нет.</div>
+      {% endif %}
+
+      <form method="post" action="{{ url_for('subscriptions_buy') }}">
+        <div class="mb-3">
+          <label class="form-label">Тариф</label>
+          <select class="form-select" name="plan">
+            <option value="month">Месяц</option>
+            <option value="quarter">Квартал</option>
+            <option value="year">Год</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Оплата</label>
+          <select class="form-select" name="pay_from">
+            <option value="balance">С баланса</option>
+            <option value="cash">Наличные</option>
+            <option value="card">Карта</option>
+          </select>
+        </div>
+        <button class="btn btn-primary w-100">Оформить / продлить</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card shadow-soft p-4">
+      <h5 class="mb-2">Правила</h5>
+      <div class="text-muted">Заготовка под будущее.</div>
+      <hr class="my-4">
+      <ul class="mb-0">
+        <li>Абонемент покрывает 1 порцию выбранного приёма пищи в день.</li>
+        <li>Доп. порции оплачиваются с баланса или наличными.</li>
+        <li>Льготы могут отключать оплату (для отдельных учеников).</li>
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

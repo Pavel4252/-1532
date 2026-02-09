@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Аналитика{% endblock %}
+{% block content %}
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="card shadow-soft p-4">
+      <h4 class="mb-1">Посещаемость</h4>
+      <div class="text-muted">Сколько учеников получали питание по дням.</div>
+      <hr class="my-4">
+      {% if attendance %}
+        <div class="table-responsive">
+          <table class="table table-sm align-middle">
+            <thead><tr><th>Дата</th><th>Завтрак</th><th>Обед</th><th>Полдник</th></tr></thead>
+            <tbody>
+              {% for a in attendance %}
+                <tr><td class="text-muted">{{ a.date }}</td><td>{{ a.breakfast }}</td><td>{{ a.lunch }}</td><td>{{ a.snack }}</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="text-muted">Данных нет.</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card shadow-soft p-4">
+      <h4 class="mb-1">Списания</h4>
+      <div class="text-muted">Причины и объёмы списаний.</div>
+      <hr class="my-4">
+      {% if writeoffs %}
+        <div class="table-responsive">
+          <table class="table table-sm align-middle">
+            <thead><tr><th>Дата</th><th>Блюдо</th><th>Кол-во</th><th>Причина</th></tr></thead>
+            <tbody>
+              {% for w in writeoffs %}
+                <tr><td class="text-muted">{{ w.date }}</td><td class="fw-semibold">{{ w.item }}</td><td>{{ w.count }}</td><td class="text-muted">{{ w.reason }}</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="text-muted">Данных нет.</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

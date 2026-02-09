@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Заявки{% endblock %}
+{% block content %}
+{% set status_map = {"new":"Новая","approved":"Принята","rejected":"Отклонена","served":"Выдана"} %}
+{% set meal_map = {"breakfast":"Завтрак","lunch":"Обед","snack":"Полдник"} %}
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="card shadow-soft p-4">
+      <h4 class="mb-1">Подать заявку на питание</h4>
+      <div class="text-muted">Ученик выбирает блюдо/приём пищи и количество.</div>
+      <hr class="my-4">
+
+      <form method="post" action="{{ url_for('orders_create') }}">
+        <div class="mb-3">
+          <label class="form-label">Приём пищи</label>
+          <select class="form-select" name="meal_type" required>
+            <option value="breakfast">Завтрак</option>
+            <option value="lunch">Обед</option>
+            <option value="snack">Полдник</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Блюдо</label>
+          <input class="form-control" name="item" placeholder="или выберите из меню" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Количество</label>
+          <input class="form-control" name="count" type="number" min="1" value="1" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Комментарий</label>
+          <textarea class="form-control" name="comment" rows="3" placeholder="аллергия/пожелания"></textarea>
+        </div>
+        <button class="btn btn-primary w-100">Отправить заявку</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card shadow-soft p-4">
+      <h5 class="mb-2">Список заявок (для повара/админа)</h5>
+      <div class="text-muted">Подтверждение/отклонение/выдача.</div>
+      <hr class="my-4">
+
+      {% if orders %}
+      <div class="list-group">
+        {% for o in orders %}
+          <div class="list-group-item">
+            <div class="d-flex justify-content-between">
+              <div class="fw-semibold">#{{ o.id }} — {{ o.student }}</div>
+              <span class="badge text-bg-secondary">{{ status_map.get(o.status, o.status) }}</span>
+            </div>
+            <div class="text-muted small">{{ meal_map.get(o.meal_type, o.meal_type) }} • {{ o.item }} • {{ o.count }} шт.</div>
+            {% if o.comment %}<div class="small mt-1 pre">{{ o.comment }}</div>{% endif %}
+            <div class="mt-2 d-flex flex-wrap gap-2">
+              <a class="btn btn-outline-success btn-sm" href="{{ url_for('orders_approve', oid=o.id) }}">Принять</a>
+              <a class="btn btn-outline-danger btn-sm" href="{{ url_for('orders_reject', oid=o.id) }}">Отклонить</a>
+              <a class="btn btn-primary btn-sm" href="/serve?order_id={{ o.id }}">Выдать</a>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+      {% else %}
+        <div class="text-muted">Пока нет заявок.</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Пользователи{% endblock %}
+{% block content %}
+<div class="card shadow-soft p-4">
+  <h4 class="mb-1">Пользователи</h4>
+  <div class="text-muted">Управление ролями: ученик / повар / админ.</div>
+  <hr class="my-4">
+
+  {% if users %}
+  <div class="table-responsive">
+    <table class="table align-middle">
+      <thead><tr><th>ФИО</th><th>Логин</th><th>Роль</th><th>Класс/должность</th><th></th></tr></thead>
+      <tbody>
+        {% for u in users %}
+          <tr>
+            <td class="fw-semibold">{{ u.name }}</td>
+            <td class="text-muted">{{ u.login }}</td>
+            <td><span class="badge text-bg-secondary">{{ u.role }}</span></td>
+            <td class="text-muted">{{ u.work }}</td>
+            <td class="text-end">
+              <a class="btn btn-outline-secondary btn-sm" href="/users/{{ u.id }}">Открыть</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <div class="text-muted">Пользователей нет.</div>
+  {% endif %}
+</div>
+{% endblock %}

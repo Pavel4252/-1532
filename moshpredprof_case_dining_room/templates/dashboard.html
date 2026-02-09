@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Панель{% endblock %}
+{% block content %}
+{% set role = (user.role if user and user.role is defined else (user.db_user_type if user else None)) %}
+
+<div class="card shadow-soft p-4">
+  <h4 class="mb-1">Панель управления</h4>
+  <div class="text-muted">
+    {% if role in ['student','just_user'] %}
+      Быстрый доступ: меню, заявка на питание, баланс и абонемент.
+    {% elif role == 'cook' %}
+      Быстрый доступ: выдача, остатки, списания, заявки учеников.
+    {% else %}
+      Быстрый доступ: пользователи, отчёты, закупки, аналитика.
+    {% endif %}
+  </div>
+</div>
+
+<div class="row g-3 mt-1">
+  <div class="col-md-6 col-lg-4"><a class="text-decoration-none" href="{{ url_for('menu') }}"><div class="card shadow-soft p-4 h-100"><h5>Меню</h5><div class="text-muted">Блюда и состав на день.</div></div></a></div>
+  <div class="col-md-6 col-lg-4"><a class="text-decoration-none" href="{{ url_for('availability') }}"><div class="card shadow-soft p-4 h-100"><h5>Остатки</h5><div class="text-muted">Сколько порций доступно.</div></div></a></div>
+  <div class="col-md-6 col-lg-4"><a class="text-decoration-none" href="{{ url_for('orders') }}"><div class="card shadow-soft p-4 h-100"><h5>Заявки</h5><div class="text-muted">Заявки учеников на питание.</div></div></a></div>
+
+  {% if role in ['cook','admin','staff','admin'] %}
+    <div class="col-md-6 col-lg-4"><a class="text-decoration-none" href="{{ url_for('serve') }}"><div class="card shadow-soft p-4 h-100"><h5>Выдача</h5><div class="text-muted">Отметить выдачу порции.</div></div></a></div>
+    <div class="col-md-6 col-lg-4"><a class="text-decoration-none" href="{{ url_for('writeoff') }}"><div class="card shadow-soft p-4 h-100"><h5>Списание</h5><div class="text-muted">Недостача/брак/жалоба.</div></div></a></div>
+    <div class="col-md-6 col-lg-4"><a class="text-decoration-none" href="{{ url_for('procurement') }}"><div class="card shadow-soft p-4 h-100"><h5>Закупки</h5><div class="text-muted">План закупок и поставщики.</div></div></a></div>
+  {% endif %}
+
+  <div class="col-md-6 col-lg-4"><a class="text-decoration-none" href="{{ url_for('payments') }}"><div class="card shadow-soft p-4 h-100"><h5>Оплата</h5><div class="text-muted">Баланс, пополнение, история.</div></div></a></div>
+  <div class="col-md-6 col-lg-4"><a class="text-decoration-none" href="{{ url_for('subscriptions') }}"><div class="card shadow-soft p-4 h-100"><h5>Абонементы</h5><div class="text-muted">Оформить/продлить.</div></div></a></div>
+  <div class="col-md-6 col-lg-4"><a class="text-decoration-none" href="/notifications"><div class="card shadow-soft p-4 h-100"><h5>Уведомления</h5><div class="text-muted">Сообщения и статусы.</div></div></a></div>
+
+  {% if role == 'admin' %}
+    <div class="col-md-6 col-lg-4"><a class="text-decoration-none" href="/users"><div class="card shadow-soft p-4 h-100"><h5>Пользователи</h5><div class="text-muted">Роли и доступ.</div></div></a></div>
+    <div class="col-md-6 col-lg-4"><a class="text-decoration-none" href="/reports"><div class="card shadow-soft p-4 h-100"><h5>Отчёты</h5><div class="text-muted">Сформировать и скачать.</div></div></a></div>
+    <div class="col-md-6 col-lg-4"><a class="text-decoration-none" href="/analytics"><div class="card shadow-soft p-4 h-100"><h5>Аналитика</h5><div class="text-muted">Посещаемость и списания.</div></div></a></div>
+  {% endif %}
+</div>
+{% endblock %}

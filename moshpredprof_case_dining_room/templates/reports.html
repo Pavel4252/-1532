@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Отчёты{% endblock %}
+{% block content %}
+<div class="card shadow-soft p-4">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+    <div>
+      <h4 class="mb-1">Отчёты</h4>
+      <div class="text-muted">Сформировать отчёты по питанию, закупкам, выдачам и списаниям.</div>
+    </div>
+    <a class="btn btn-primary" href="/reports/create">Сформировать</a>
+  </div>
+  <hr class="my-4">
+
+  {% if reports %}
+    <div class="list-group">
+      {% for r in reports %}
+        <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+           href="/reports/{{ r.id }}/download">
+          <span>{{ r.title }}</span>
+          <span class="badge text-bg-secondary">скачать</span>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="text-muted">Пока отчётов нет.</div>
+  {% endif %}
+</div>
+{% endblock %}

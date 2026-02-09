@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Жалобы{% endblock %}
+{% block content %}
+{% set meal_map = {"breakfast":"Завтрак","lunch":"Обед","snack":"Полдник"} %}
+{% set status_map = {"new":"Новая","in_review":"В работе","resolved":"Решена","rejected":"Отклонена"} %}
+
+<div class="card shadow-soft p-4">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+    <div>
+      <h4 class="mb-1">Жалобы учеников</h4>
+      <div class="text-muted">Обрабатывайте обращения: отвечайте и меняйте статус.</div>
+    </div>
+    <a class="btn btn-outline-secondary btn-sm" href="/dashboard">Назад</a>
+  </div>
+
+  <div class="mt-3 d-flex gap-2">
+    <a class="btn btn-outline-primary btn-sm" href="{{ url_for('complaints') }}">Только активные</a>
+    <a class="btn btn-outline-secondary btn-sm" href="/complaints?show=all">Показать все</a>
+  </div>
+
+  <hr class="my-4">
+
+  {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+  {% if message %}<div class="alert alert-success">{{ message }}</div>{% endif %}
+
+  {% if complaints %}
+    <div class="vstack gap-3">
+      
+      {% for c in complaints %}
+        {% if show_all or c.status not in ['resolved','rejected'] %}
+        <div class="border rounded-4 p-3 bg-white">
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <div class="fw-semibold">#{{ c.id }} • {{ c.ts }} • {{ c.student_name }}</div>
+            <span class="badge badge-soft">{{ status_map.get(c.status, c.status) }}</span>
+          </div>
+
+          <div class="small text-muted mt-1">
+            {% if c.meal_date %}Дата: {{ c.meal_date }}{% endif %}
+            {% if c.meal_type %} • {{ meal_map.get(c.meal_type, c.meal_type) }}{% endif %}
+            {% if c.item %} • Блюдо: {{ c.item }}{% endif %}
+            {% if c.rating %} • Оценка: {{ c.rating }}/5{% endif %}
+          </div>
+
+          <div class="mt-2">{{ c.text }}</div>
+
+          {% if c.answer %}
+            <div class="mt-3 p-3 rounded-3 bg-light">
+              <div class="fw-semibold">Ответ:</div>
+              <div>{{ c.answer }}</div>
+              {% if c.answered_ts %}<div class="text-muted small mt-1">{{ c.answered_ts }}</div>{% endif %}
+            </div>
+          {% endif %}
+
+          <form class="mt-3" method="post" action="/complaints/{{ c.id }}/answer">
+            <div class="row g-2 align-items-end">
+              <div class="col-lg-7">
+                <label class="form-label mb-1">Ответ</label>
+                <textarea class="form-control" name="answer" rows="2" placeholder="Напишите ответ..." {% if c.status in ['resolved','rejected'] %}disabled{% endif %}></textarea>
+              </div>
+              <div class="col-lg-3">
+                <label class="form-label mb-1">Статус</label>
+                <select class="form-select" name="status" {% if c.status in ['resolved','rejected'] %}disabled{% endif %}>
+                  <option value="in_review">В работе</option>
+                  <option value="resolved">Решена</option>
+                  <option value="rejected">Отклонена</option>
+                </select>
+              </div>
+              <div class="col-lg-2 d-grid">
+                <button class="btn btn-primary" type="submit" {% if c.status in ['resolved','rejected'] %}disabled{% endif %}>Сохранить</button>
+              </div>
+            </div>
+            {% if c.status in ['resolved','rejected'] %}
+              <div class="text-muted small mt-2">Жалоба закрыта — чтобы переоткрыть, поменяйте статус в базе (или добавьте отдельную кнопку «Переоткрыть»).</div>
+            {% endif %}
+          </form>
+        </div>
+      
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="text-muted">Пока нет жалоб.</div>
+  {% endif %}
+</div>
+{% endblock %}

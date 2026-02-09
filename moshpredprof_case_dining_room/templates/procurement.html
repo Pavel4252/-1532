@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Закупки{% endblock %}
+{% block content %}
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="card shadow-soft p-4">
+      <h4 class="mb-1">План закупок</h4>
+      <div class="text-muted">Добавьте позицию к закупке.</div>
+      <hr class="my-4">
+
+      <form method="post" action="/procurement">
+        <div class="mb-3">
+          <label class="form-label">Наименование</label>
+          <input class="form-control" name="itemName" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Категория</label>
+          <input class="form-control" name="itemCategory" required>
+        </div>
+        <div class="row g-2">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Цена (₽)</label>
+            <input class="form-control" type="number" name="price" min="1" required>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Количество</label>
+            <input class="form-control" type="number" name="count" min="1" required>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Поставщик</label>
+          <input class="form-control" name="supplier" required>
+        </div>
+        <button class="btn btn-primary w-100">Добавить</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card shadow-soft p-4">
+      <h5 class="mb-2">Текущий список</h5>
+      <hr class="my-4">
+
+      {% if plans %}
+      <div class="table-responsive">
+        <table class="table table-sm align-middle">
+          <thead><tr><th>ID</th><th>Позиция</th><th>Категория</th><th>Кол-во</th><th>Цена</th><th>Поставщик</th></tr></thead>
+          <tbody>
+            {% for p in plans %}
+              <tr>
+                <td class="mono">#{{ p.id }}</td>
+                <td class="fw-semibold">{{ p.name }}</td>
+                <td class="text-muted">{{ p.category }}</td>
+                <td>{{ p.count }}</td>
+                <td>{{ p.price }} ₽</td>
+                <td class="text-muted">{{ p.supplier }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+        <div class="text-muted">Пока пусто.</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

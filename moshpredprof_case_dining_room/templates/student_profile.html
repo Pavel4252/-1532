@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Профиль ученика{% endblock %}
+{% block content %}
+<div class="row g-3">
+  <div class="col-lg-4">
+    <div class="card shadow-soft p-4">
+      <h4 class="mb-1">Профиль</h4>
+      <div class="text-muted">Данные ученика, льготы и аллергии.</div>
+      <hr class="my-4">
+
+      <div class="mb-2"><span class="text-muted">ФИО:</span> <b>{{ student.name }}</b></div>
+      <div class="mb-2"><span class="text-muted">Класс:</span> <b>{{ student.work }}</b></div>
+      <div class="mb-2"><span class="text-muted">Льгота:</span> <b>{{ student.benefit or '—' }}</b></div>
+      <div class="mb-2"><span class="text-muted">Аллергии:</span> <b>{{ student.allergy or '—' }}</b></div>
+
+      <hr class="my-4">
+      <a class="btn btn-outline-secondary w-100" href="/users">← к списку</a>
+    </div>
+  </div>
+
+  <div class="col-lg-8">
+    <div class="card shadow-soft p-4">
+      <h5 class="mb-1">История питания</h5>
+      <div class="text-muted">Выдачи, списания, заявки.</div>
+      <hr class="my-4">
+
+      {% if history %}
+        <div class="table-responsive">
+          <table class="table align-middle">
+            <thead><tr><th>Дата</th><th>Событие</th><th>Описание</th></tr></thead>
+            <tbody>
+              {% for h in history %}
+                <tr><td class="text-muted small">{{ h.ts }}</td><td><span class="badge text-bg-secondary">{{ h.type }}</span></td><td>{{ h.text }}</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="text-muted">Пока пусто.</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

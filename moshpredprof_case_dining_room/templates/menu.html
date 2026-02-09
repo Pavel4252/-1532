@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}Меню{% endblock %}
+{% block content %}
+<div class="row g-3">
+  <div class="col-lg-7">
+    <div class="card shadow-soft p-4">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <h4 class="mb-1">Меню на день</h4>
+          <div class="text-muted">Список блюд, калорийность, аллергены и цена/порция.</div>
+        </div>
+        <div class="d-flex gap-2">
+          <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('menu_history') }}">История</a>
+          <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('availability') }}">Остатки</a>
+        </div>
+      </div>
+
+      <hr class="my-4">
+
+      {% if menu_items %}
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th>Блюдо</th>
+              <th class="text-nowrap">Приём пищи</th>
+              <th class="text-nowrap">Цена</th>
+              <th class="text-nowrap">Ккал</th>
+              <th>Аллергены</th>
+              <th class="text-nowrap">Доступно</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for m in menu_items %}
+            <tr>
+              <td class="fw-semibold">{{ m.name }}</td>
+              <td class="text-muted">{{ m.meal_type }}</td>
+              <td>{{ m.price }} ₽</td>
+              <td class="text-muted">{{ m.kcal }}</td>
+              <td class="text-muted">{{ m.allergens or '-' }}</td>
+              <td><span class="badge text-bg-success">{{ m.available }}</span></td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+        <div class="text-muted">Меню ещё не опубликовано.</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card shadow-soft p-4">
+      <h5 class="mb-2">Публикация/редактирование меню (для повара/админа)</h5>
+      <div class="text-muted">Форма для будущего бэкенда.</div>
+      <hr class="my-4">
+
+      <form method="post" action="/menu">
+        <div class="mb-3">
+          <label class="form-label">Название блюда</label>
+          <input class="form-control" name="name" placeholder="например: гречка с котлетой">
+        </div>
+        <div class="row g-2">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Приём пищи</label>
+            <select class="form-select" name="meal_type">
+              <option value="breakfast">Завтрак</option>
+              <option value="lunch">Обед</option>
+              <option value="snack">Полдник</option>
+            </select>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Цена (₽)</label>
+            <input class="form-control" name="price" type="number" min="0" step="1">
+          </div>
+        </div>
+
+        <div class="row g-2">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Ккал</label>
+            <input class="form-control" name="kcal" type="number" min="0" step="1">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Порций</label>
+            <input class="form-control" name="portions" type="number" min="0" step="1">
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Аллергены</label>
+          <input class="form-control" name="allergens" placeholder="молоко, яйца, глютен...">
+        </div>
+
+        <button class="btn btn-primary w-100">Сохранить</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

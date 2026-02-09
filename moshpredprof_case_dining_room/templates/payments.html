@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Оплата{% endblock %}
+{% block content %}
+{% set tx_map = {"topup":"Пополнение","charge":"Списание"} %}
+
+<div class="row g-3">
+  <div class="col-lg-5">
+    <div class="card shadow-soft p-4">
+      <h4 class="mb-1">Баланс</h4>
+      <div class="text-muted">Пополнение и история операций.</div>
+      <hr class="my-4">
+
+      <div class="border rounded-4 p-3 bg-white mb-3">
+        <div class="text-muted small">Текущий баланс</div>
+        <div class="display-6 mb-0">{{ balance if balance is defined else "—" }} ₽</div>
+      </div>
+
+      <form method="post" action="{{ url_for('payments_topup') }}">
+        <div class="mb-3">
+          <label class="form-label">Сумма пополнения (₽)</label>
+          <input class="form-control" type="number" name="amount" min="1" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Способ</label>
+          <select class="form-select" name="method">
+            <option value="cash">Наличные</option>
+            <option value="card">Карта</option>
+            <option value="transfer">Перевод</option>
+          </select>
+        </div>
+        <button class="btn btn-primary w-100">Пополнить</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-lg-7">
+    <div class="card shadow-soft p-4">
+      <div class="d-flex justify-content-between">
+        <div>
+          <h5 class="mb-1">История операций</h5>
+          <div class="text-muted">Пополнения и списания.</div>
+        </div>
+        <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('payments_export') }}">Экспорт</a>
+      </div>
+
+      <hr class="my-4">
+
+      {% if transactions %}
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th>Дата</th>
+              <th>Тип</th>
+              <th>Описание</th>
+              <th class="text-end">Сумма</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for t in transactions %}
+              <tr>
+                <td class="text-muted small">{{ t.ts }}</td>
+                <td><span class="badge text-bg-secondary">{{ tx_map.get(t.type, t.type) }}</span></td>
+                <td>{{ t.note }}</td>
+                <td class="text-end {% if t.amount < 0 %}text-danger{% else %}text-success{% endif %}">
+                  {{ t.amount }} ₽
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+        <div class="text-muted">Пока нет операций.</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% endblock %}

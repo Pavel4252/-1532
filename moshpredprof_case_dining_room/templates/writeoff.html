@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Списание{% endblock %}
+
+{% block content %}
+<div class="card shadow-soft p-4">
+  <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+    <div>
+      <h3 class="fw-bold mb-1">Списание</h3>
+      <div class="text-muted">Уменьшает доступные порции в меню на сегодня и добавляет запись списания.</div>
+    </div>
+  </div>
+
+  <hr class="my-4">
+
+  <form method="post" class="row g-3">
+    <div class="col-md-6">
+      <label class="form-label">Позиция (сегодня)</label>
+      <select name="item_id" class="form-select" required>
+        <option value="" selected disabled>Выберите блюдо</option>
+        {% for m in menu_today %}
+          <option value="{{ m.id }}">
+            {{ m.name }} — {{ MEAL_RU.get(m.meal_type, m.meal_type) }} · доступно: {{ m.portions_available }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="col-md-2">
+      <label class="form-label">Кол-во</label>
+      <input type="number" class="form-control" name="count" value="1" min="1" required>
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label">Причина</label>
+      <select name="reason" class="form-select" required>
+        <option value="" selected disabled>Выберите причину</option>
+        <option>Истёк срок</option>
+        <option>Брак</option>
+        <option>Остатки</option>
+        <option>Сан. нормы</option>
+      </select>
+    </div>
+
+    <div class="col-12">
+      <label class="form-label">Комментарий (необязательно)</label>
+      <input class="form-control" name="comment" placeholder="например: разлив компота (1 л)">
+    </div>
+
+    <div class="col-12 d-flex justify-content-end">
+      <button class="btn btn-danger px-4">🗑️ Списать</button>
+    </div>
+  </form>
+
+  <hr class="my-4">
+
+  <h5 class="fw-semibold mb-3">История списаний</h5>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead>
+        <tr>
+          <th>Дата</th>
+          <th>Позиция</th>
+          <th>Кол-во</th>
+          <th>Причина</th>
+          <th>Комментарий</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in history %}
+        <tr>
+          <td class="text-muted">{{ r.ts }}</td>
+          <td class="fw-semibold">{{ r.item }}</td>
+          <td>{{ r.count }}</td>
+          <td><span class="badge bg-warning-subtle text-warning">{{ r.reason }}</span></td>
+          <td class="text-muted">{{ r.comment or "" }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="text-muted">Пока нет списаний.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

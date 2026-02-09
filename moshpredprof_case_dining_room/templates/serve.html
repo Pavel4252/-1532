@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}Выдача{% endblock %}
+
+{% block content %}
+<div class="card shadow-soft p-4">
+  <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+    <div>
+      <h3 class="fw-bold mb-1">Выдача</h3>
+      <div class="text-muted">Выдача блюда ученику + списание порций со склада (меню на сегодня).</div>
+    </div>
+    <span class="badge badge-soft">Сегодня: {{ today_str() if today_str is defined else "" }}</span>
+  </div>
+
+  <hr class="my-4">
+
+  <form method="post" class="row g-3">
+    <div class="col-md-4">
+      <label class="form-label">Ученик</label>
+      <select name="student_id" class="form-select" required>
+        <option value="" selected disabled>Выберите ученика</option>
+        {% for s in students %}
+          <option value="{{ s.id }}">{{ s.name }} ({{ s.work }})</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label">Позиция меню (сегодня)</label>
+      <select name="item_id" class="form-select" required>
+        <option value="" selected disabled>Выберите блюдо</option>
+        {% for m in menu_today %}
+          <option value="{{ m.id }}">
+            {{ m.name }} — {{ MEAL_RU.get(m.meal_type, m.meal_type) }} · {{ m.price }}₽ · доступно: {{ m.portions_available }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="col-md-2">
+      <label class="form-label">Кол-во</label>
+      <input type="number" class="form-control" name="count" value="1" min="1" required>
+    </div>
+
+    <div class="col-md-2">
+      <label class="form-label">Оплата</label>
+      <select name="pay_type" class="form-select" required>
+        <option value="balance" selected>Баланс</option>
+        <option value="subscription">Абонемент</option>
+        <option value="free">Бесплатно</option>
+      </select>
+    </div>
+
+    <div class="col-12">
+      <label class="form-label">Комментарий (необязательно)</label>
+      <input class="form-control" name="comment" placeholder="например: выдано без сдачи">
+    </div>
+
+    <div class="col-12 d-flex gap-2 justify-content-end">
+      <button class="btn btn-primary px-4">✅ Выдать</button>
+    </div>
+  </form>
+
+  <hr class="my-4">
+
+  <h5 class="fw-semibold mb-3">История выдач</h5>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead>
+        <tr>
+          <th>Дата</th>
+          <th>Ученик</th>
+          <th>Позиция</th>
+          <th>Приём</th>
+          <th>Кол-во</th>
+          <th>Оплата</th>
+          <th class="text-end">Сумма</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in history %}
+        <tr>
+          <td class="text-muted">{{ r.ts }}</td>
+          <td>{{ r.student_name }}</td>
+          <td class="fw-semibold">{{ r.item }}</td>
+          <td>{{ MEAL_RU.get(r.meal_type, r.meal_type) }}</td>
+          <td>{{ r.count }}</td>
+          <td>
+            {% if r.pay_type == 'balance' %}
+              <span class="badge bg-primary-subtle text-primary">баланс</span>
+            {% elif r.pay_type == 'subscription' %}
+              <span class="badge bg-success-subtle text-success">абонемент</span>
+            {% else %}
+              <span class="badge bg-secondary-subtle text-secondary">бесплатно</span>
+            {% endif %}
+          </td>
+          <td class="text-end mono">{{ r.amount }} ₽</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7" class="text-muted">Пока нет выдач.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

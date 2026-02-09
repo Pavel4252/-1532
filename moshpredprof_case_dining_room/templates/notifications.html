@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Уведомления{% endblock %}
+{% block content %}
+<div class="card shadow-soft p-4">
+  <h4 class="mb-1">Уведомления</h4>
+  <div class="text-muted">Статусы заявок, сообщения, события системы.</div>
+  <hr class="my-4">
+
+  {% if notices %}
+    {% for n in notices %}
+      <div class="border rounded-4 p-3 bg-white mb-2">
+        <div class="d-flex justify-content-between">
+          <div class="fw-semibold">{{ n.title }}</div>
+          <div class="text-muted small">{{ n.ts }}</div>
+        </div>
+        <div class="text-muted small">От: {{ n.sender }} • Кому: {{ n.recipient }}</div>
+        {% if n.text %}<div class="small mt-2 pre">{{ n.text }}</div>{% endif %}
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="text-muted">Уведомлений пока нет.</div>
+  {% endif %}
+</div>
+{% endblock %}
